@@ -1,6 +1,6 @@
 {
   "name": "svelte-sortable",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Svelte wrapper component for SortableJS.",
   "main": "index.svelte",
   "author": "robin@pettersen.dev",

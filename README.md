@@ -8,16 +8,26 @@
 ## Usage
 ```sveltehtml
 <script>
-    import SvelteSortable from "svelte-sortable"
+    import Sortable from "svelte-sortable"
 
     let items = [
-        "wibble",
-        "wobble",
-        "wubble",
+        "foo",
+        "bar",
+        "baz",
     ]
+
+    function onChange() {
+        //`items` are mutated
+        console.log(items)
+    }
+
 </script>
 
-<SvelteSortable {items} let:item={item}>
-    <span>{item}</span>
-</SvelteSortable>
+<Sortable {items}
+          let:item={item}
+          on:change={onChange}>
+    <div>
+        {item}
+    </div>
+</Sortable>
 ```

@@ -1,6 +1,6 @@
 <script>
     import Sortable from "sortablejs"
-    import { onMount, onDestroy } from "svelte"
+    import {onMount,onDestroy,createEventDispatcher} from "svelte"
 
     // var sortable = new Sortable(el, {
     //     group: "name",  // or { name: "...", pull: [true, false, 'clone', array], put: [true, false, array] }
@@ -123,18 +123,37 @@
     //     }
     // });
 
+    const dispatch = createEventDispatcher()
+
+    export let options = {}
     export let items = []
 
     let targetEl
     let sortable
 
     onMount(() => {
-        sortable = Sortable.create(targetEl)
+        sortable = Sortable.create(
+                targetEl,
+                Object.assign(
+                        options, {
+                            onUpdate: ev => {
+                                moveArrayElement(items, ev.oldIndex, ev.newIndex)
+                                dispatch(`change`, items)
+                            }
+                        }
+                )
+        )
     })
 
     onDestroy(() => {
         sortable.destroy()
     })
+
+    function moveArrayElement(array, from, to) {
+        const item = array[from]
+        array.splice(from, 1)
+        array.splice(to, 0, item)
+    }
 
 </script>
 
