@@ -1,6 +1,8 @@
 <script>
     import Sortable from "sortablejs"
-    import {onMount,onDestroy,createEventDispatcher} from "svelte"
+    import gibstr from "gibstr"
+    import {onMount, onDestroy, createEventDispatcher} from "svelte"
+    import store from "./store.js"
 
     // var sortable = new Sortable(el, {
     //     group: "name",  // or { name: "...", pull: [true, false, 'clone', array], put: [true, false, array] }
@@ -130,16 +132,42 @@
 
     let targetEl
     let sortable
+    let id = gibstr()
+    let unsubscribe
 
     onMount(() => {
+
+        //This is currently only used to add items from another list.
+        unsubscribe = store.subscribe(event => {
+            if (!event || event.id !== id) {
+                return
+            }
+
+            items.splice(event.index, 0, event.item)
+            console.log(items)
+        })
+
         sortable = Sortable.create(
                 targetEl,
-                Object.assign(
-                        options, {
-                            onUpdate: ev => {
-                                moveArrayElement(items, ev.oldIndex, ev.newIndex)
+                Object.assign(options, {
+                            // Called by any change to the list (add / update / remove)
+                            onSort: ev => {
+                                if (ev.to.id === id) {
+                                    moveArrayElement(items, ev.oldIndex, ev.newIndex)
+                                } else {
+                                    const item = items.splice(ev.oldIndex, 1)
+
+                                    store.set({
+                                        id: ev.to.id,
+                                        index: ev.newIndex,
+                                        item: item[0]
+                                    })
+                                }
+
                                 dispatch(`change`, items)
+
                             }
+
                         }
                 )
         )
@@ -147,6 +175,7 @@
 
     onDestroy(() => {
         sortable.destroy()
+        unsubscribe()
     })
 
     function moveArrayElement(array, from, to) {
@@ -157,8 +186,8 @@
 
 </script>
 
-<div bind:this={targetEl}>
+<div bind:this={targetEl} {id}>
     {#each items as item}
-        <slot item={item}></slot>
+        <slot {item}></slot>
     {/each}
 </div>
