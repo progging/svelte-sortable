@@ -8,7 +8,10 @@
 ## Usage
 ```sveltehtml
 <script>
-    import Sortable from "svelte-sortable"
+    import { Sortable, MultiDrag } from "svelte-sortable"
+
+    // In case multiselection is to be used 
+    Sortable.mount(new MultiDrag());
 
     let items = [
         "foo",
