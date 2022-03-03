@@ -1,7 +1,7 @@
 <script>
     import Sortable from "sortablejs";
-    
-    import { onMount, onDestroy, createEventDispatcher } from "svelte";
+
+    import { createEventDispatcher } from "svelte";
     import store from "./store.js";
 
     // var sortable = new Sortable(el, {
@@ -130,12 +130,11 @@
     export let options = {};
     export let items = [];
 
-    let targetEl;
     let sortable;
 
-    onMount(() => {
+    function create(node) {
         sortable = Sortable.create(
-            targetEl,
+            node,
             Object.assign(options, {
                 onRemove: (ev) => {
                     if (ev.oldIndicies.length > 0) {
@@ -169,7 +168,7 @@
                     });
                 },
                 onUpdate: (ev) => {
-                    // guard against 'update' event fired when there is more than one list - 
+                    // guard against 'update' event fired when there is more than one list -
                     // source list is reordered, and this breaks 'remove' event fired later,
                     // as indicies values are not valid any longer
                     if (ev.pullMode !== true && ev.oldIndicies.length > 0) {
@@ -187,11 +186,13 @@
                 },
             })
         );
-    });
 
-    onDestroy(() => {
-        sortable.destroy();
-    });
+        return {
+            destroy() {
+                sortable.destroy();
+            },
+        };
+    }
 
     function moveArrayElement(array, from, to) {
         const item = array[from];
@@ -200,7 +201,7 @@
     }
 
     function moveArrayElements(array, oldIndicies, newIndicies) {
-        const itemsNo  = oldIndicies.length;
+        const itemsNo = oldIndicies.length;
         // mappings [ [src idx1, dest idx2], ... , [src idxn, dest idxn]]
         let mappings = new Array(itemsNo);
         for (let i = 0; i < itemsNo; i++) {
@@ -216,7 +217,7 @@
     }
 </script>
 
-<div bind:this={targetEl}>
+<div use:create>
     {#each items as item}
         <slot {item} />
     {/each}
