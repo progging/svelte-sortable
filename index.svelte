@@ -130,10 +130,8 @@
     export let options = {};
     export let items = [];
 
-    let sortable;
-
     function create(node) {
-        sortable = Sortable.create(
+        const sortable = Sortable.create(
             node,
             Object.assign(options, {
                 onRemove: (ev) => {
